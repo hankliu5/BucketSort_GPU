@@ -28,13 +28,16 @@ __global__ void gpu_sort(float *input, int *output, int* step) {
   output[index] = __float2int_rd(input[index] / *step);
 }
 
-int cuda_sort(int number_of_elements, float *a, int step)
+int cuda_sort(int number_of_elements, float *a)
 {
   const int NUM_BUCKETS = 6;
   float *d_in;
   int *d_out;
   int *out = (int *) malloc(sizeof(float) * number_of_elements);
   int *d_step;
+  float max_num = *max_element(a, a + number_of_elements);
+  int step = ceil(max_num / number_of_elements);
+
   vector<float> buckets[NUM_BUCKETS];
   cudaMalloc(&d_in, sizeof(float) * number_of_elements);
   cudaMalloc(&d_out, sizeof(int) * number_of_elements);
