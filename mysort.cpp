@@ -3,8 +3,20 @@
 #include <string.h>
 #include <math.h>
 #include <float.h>
+#include <fcntl.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/time.h>
+#include <ctime>
+#include <string>
+#include <vector>
+#include <iterator>
+#include <algorithm>
 #include "mysort.h"
+
+using namespace std;
 
 int compare_function(const void *a, const void *b) {
 	if(*((float *)a) < *((float *)b)) return -1; 
@@ -55,6 +67,8 @@ main( int argc, char** argv)
     memcpy(output_data, input_data, mem_size);
     gettimeofday(&time_end, NULL);
     fprintf(stderr,"memcpy: %ld\n",((time_end.tv_sec * 1000000 + time_end.tv_usec) - (time_start.tv_sec * 1000000 + time_start.tv_usec)));
+    float max_num = *max_element(output_data, output_data + numElements);
+    int step = ceil(max_num / numElements);
     switch(mode)
     {
         case 1:
@@ -71,7 +85,7 @@ main( int argc, char** argv)
 //            break;
           case 3:
             gettimeofday(&time_start, NULL);
-            cuda_sort(numElements, output_data);
+            cuda_sort(numElements, output_data, step);
             gettimeofday(&time_end, NULL);
             fprintf(stderr,"Sorting on GPU: %ld\n",((time_end.tv_sec * 1000000 + time_end.tv_usec) - (time_start.tv_sec * 1000000 + time_start.tv_usec)));
             break;
