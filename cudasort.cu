@@ -3,6 +3,12 @@
 #include <time.h>
 #include <assert.h>
 #include <sys/time.h>
+#include <thrust/host_vector.h>
+#include <thrust/device_vector.h>
+#include <thrust/generate.h>
+#include <thrust/sort.h>
+#include <thrust/copy.h>
+#include <cstdlib>
 #include <vector>
 #include <ctime>
 #include <string>
@@ -43,7 +49,9 @@ int cuda_sort(int number_of_elements, float *a, int step)
     buckets[out[i]].push_back(a[i]);
   }
   for (int i = 0; i < NUM_BUCKETS; i++) {
-    sort(buckets[i].begin(), buckets[i].end());
+    thrust::device_vector<float> d_vec = buckets[i];
+    thrust::sort(d_vec.begin(), d_vec.end());
+    thrust::copy(d_vec.begin(), d_vec.end(), buckets[i].begin());
   } 
   int index = 0;
   for (int i = 0; i < NUM_BUCKETS; i++)
